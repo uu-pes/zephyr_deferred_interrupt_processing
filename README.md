@@ -11,7 +11,7 @@ These tasks are notified by the ISR to perform interrupt-related processing usin
 
 In this example, an interrupt is registered on pressing a button.
 The corresponding ISR toggles an LED, toggling which is deferred to a task using semaphores.
-The example also illustrates how buttons can be added to the device tree and configured in Zephyr.
+This example also illustrates how buttons can be added to the device tree and configured in Zephyr.
 Notice that to change the LED/button we only need to tweak the device tree, while our application stays unmodified!
 The same case would be if we wanted to run our application on a different board!
 
