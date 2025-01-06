@@ -4,38 +4,39 @@
 #define STACK_SIZE 500
 #define PRIO_BUTTON_TASK 5
 
-#define LED0_NODE DT_ALIAS(led0)
+#define LED_NODE DT_ALIAS(led)
 #define BTN_NODE DT_ALIAS(btn)
 
-/* Creating mechanisms for synchronization */
-struct k_sem sem;
+/* Creates semaphore with count set to 0 and limit to 1 */
+K_SEM_DEFINE(sem, 0, 1)
 
 /* Creating LED and button structures*/
-const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
 const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(BTN_NODE, gpios);
 
 /* Callback structure */
 static struct gpio_callback btn_cb_data;
 
-/* On ISR give semaphore */
+/* ISR which button press gives semaphore to button task. 
+For simplicity, we omit software debouncing. */
 void button_isr() {
     k_sem_give(&sem);
 }
 
+/* Initialization function */
 void init() {
-    gpio_pin_configure_dt(&led,  GPIO_OUTPUT_ACTIVE);
-    gpio_pin_set_dt(&led, GPIO_ACTIVE_HIGH);
-    
+    /* Configures LED and button */
+    gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
     gpio_pin_configure_dt(&btn, GPIO_INPUT);
-    /* Sets interrupt on edge to active level */
+
+    /* Registers interrupt on edge to active level */
     gpio_pin_interrupt_configure_dt(&btn, GPIO_INT_EDGE_TO_ACTIVE);
+
     /* Initializes callback struct with ISR and the pins on which ISR should trigger  */
     gpio_init_callback(&btn_cb_data, button_isr, BIT(btn.pin));
-    /* Adds it to the device */
-    gpio_add_callback_dt(&btn, &btn_cb_data);
 
-    /* Initializes semaphore with count set to 0 and limit to 1 */
-    k_sem_init(&sem, 0, 1);
+    /* Adds ISR callback to the device */
+    gpio_add_callback_dt(&btn, &btn_cb_data);
 }
 
 /* Toggles LED on button press*/
