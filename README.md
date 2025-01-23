@@ -35,7 +35,7 @@ Once successful, building will create a `build` folder where the application bin
 
 ## Loading and running
 
-Loading the application onto the device can be done by connecting to the device via USB with Bootsel pressed, and then running:
+Loading the application onto the device can be done by connecting to the device via USB with Bootsel pressed, and then copying the binary to the device, which can be done in a file explorer, or in a terminal by running:
 
 ```bash
 picotool load build/zephyr/zephyr.uf2 
